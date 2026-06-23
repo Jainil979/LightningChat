@@ -1,0 +1,44 @@
+/* Custom cursor (optional) */
+#cursor {
+  position: fixed;
+  width: 10px;
+  height: 10px;
+  background-color: #3BEDB2;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 999;
+  transition: transform 0.1s;
+}
+#cursor-border {
+  position: fixed;
+  width: 30px;
+  height: 30px;
+  border: 1px solid #3BEDB2;
+  border-radius: 50%;
+  pointer-events: none;
+  transition: all 0.15s ease-out;
+  z-index: 999;
+}
+@media (max-width: 768px) {
+  #cursor, #cursor-border { display: none; }
+}
+
+/* Typing indicator */
+.typing-indicator {
+  @apply inline-block w-2 h-2 rounded-full bg-primary;
+  animation: typing 1.4s infinite ease-in-out both;
+}
+.typing-indicator:nth-child(1) { animation-delay: -0.32s; }
+.typing-indicator:nth-child(2) { animation-delay: -0.16s; }
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 5px;
+}
+::-webkit-scrollbar-track {
+  background: #1a1f2e;
+}
+::-webkit-scrollbar-thumb {
+  background: #3BEDB2;
+  border-radius: 10px;
+}
