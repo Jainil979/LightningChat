@@ -13,6 +13,7 @@ import { useAuth } from '../context/AuthContext';
 import { decode } from '@msgpack/msgpack';
 import { VideoCallManager } from '../services/videoCallService';
 import { encodeTypingToTarget } from '../utils/binaryProtocol';   // 👈 new import
+import OfflineCallModal from '../components/chat/OfflineCallModal';
 
 // ---------- Helpers (outside component to keep stable) ----------
 const truncate = (text) => (text.length > 28 ? text.slice(0, 28) + '...' : text);
@@ -32,6 +33,9 @@ const Chat = () => {
 
   // ---------- Typing indicator state ----------
   const [typingPeerId, setTypingPeerId] = useState(null);   // 👈 new
+
+  const [offlineCallModal, setOfflineCallModal] = useState(false);
+  const [offlineCallName, setOfflineCallName] = useState('');
 
   const { user } = useAuth();
   const { send } = useWebSocket();          // binary WebSocket sender
@@ -241,6 +245,17 @@ const Chat = () => {
   // Generic start call function
   const startCall = useCallback((mediaType) => {
     if (!activeContact || activeCallRef.current) return;
+
+    const contact = contacts.find(c => c.id === activeContact);
+    if (!contact) return;
+
+    // Show offline modal and stop if the peer is offline
+    if (!contact.online) {
+      setOfflineCallName(contact.name);
+      setOfflineCallModal(true);
+      return;
+    }
+
     const myName = user ? `${user.firstName} ${user.lastName}` : 'You';
     const manager = new VideoCallManager(send, Number(user.userId));
     manager.onLocalStream = (stream) =>
@@ -263,7 +278,7 @@ const Chat = () => {
     window.__videoCallManager = manager;
     manager.startCall(activeContact, myName, mediaType);
     setActiveCall({ type: mediaType, localStream: null, remoteStream: null });
-  }, [activeContact, user, send]);
+  }, [activeContact, user, send, contacts]);
 
   const startVideoCall = useCallback(() => startCall('video'), [startCall]);
   const startVoiceCall = useCallback(() => startCall('voice'), [startCall]);
@@ -490,6 +505,13 @@ const Chat = () => {
         callType={incomingCall?.callType || 'video'}
         onAccept={acceptIncomingCall}
         onDecline={declineIncomingCall}
+      />
+
+      {/* Offline call modal */}
+      <OfflineCallModal
+        isOpen={offlineCallModal}
+        contactName={offlineCallName}
+        onClose={() => setOfflineCallModal(false)}
       />
     </div>
   );
