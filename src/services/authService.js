@@ -11,7 +11,7 @@ import {
 
 import { authFetch } from '../utils/authFetch.js';
 
-export const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:3000'; // 'http://10.191.183.33:3000'
+export const API_BASE = import.meta.env.VITE_API_URL || ''; // 'http://localhost:3000';
 
 export async function signup(userData) {
   const url = `${API_BASE}/api/auth/signup`;
